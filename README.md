@@ -3,17 +3,36 @@
 ## Pre-requisites
 
 1. If on Mac, install Homebrew and Ansible 
-2. Clone this repo and move into it
+2. Install packages for your distro with:  
+  
+  
+  Mac:
+  ```sh 
+  # TODO: might not work if having multiple files  
+  ansible-pull -U https://github.com/MarkusSagen/ansible-desktop.git   
+  ```
 
+3. Or clone the repo and do the installation manually:
+  
+  ```sh
+  ansible-playbook -i inventory playbooks/homebrew.yml
+
+  # To install specific target and tasks
+  ansible-playbook playbooks/homebrew.yml --limit=my.laptop --tags=packages
+  ```
+
+---
 
 ## Setting up the script
 
 The instructions and inspiration for this is taken from: 
-https://opensource.com/article/22/6/install-software-macos-ansible-homebrew
+- https://opensource.com/article/22/6/install-software-macos-ansible-homebrew
+- https://github.com/ruanbekker/ansible-macbook-setup
 
 1. Install ansible 
   
   ```sh
+  # pip install ansible==4.9.0
   brew install ansible  
   ```
 
