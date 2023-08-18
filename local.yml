@@ -1,10 +1,41 @@
 ---
-- hosts: localhost
-  connection: local
-  become: true
+- name: Install software
+  hosts: localhost
+  become: false
 
+  vars:
+    Brew_packages:
+      - asciidoctor
+    install_homebrew_if_missing: true
+
+  # Pre-requisites
+  pre_tasks:
+    - name: Ensuring Homebrew Is Installed
+      stat:
+        path: /usr/local/bin/brew
+      register: homebrew_check
+
+    - name: Fail If Homebrew Is Not Installed and install_homebrew_if_missing Is False
+      fail:
+        msg: Homebrew is missing, install from http://brew.sh
+      when:
+        - not homebrew_check.stat.exists
+        - not install_homebrew_if_missing
+
+    - name: Installing Homebrew
+      shell: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      when:
+        - not homebrew_check.stat.exists
+        - install_homebrew_if_missing
+  
+  #####################################################################
+  #                                                                   #
+  # Tasks (install)                                                   #
+  #                                                                   #
+  #####################################################################
   tasks:
-    - name: install htop
-      # Specify ansible module to run
-      package:
-        name: htop
+    - name: Install Asciidoctor
+      # Ansible offers different modules that can do different things
+      homebrew: 
+        name: asciidoctor
+        state: present
