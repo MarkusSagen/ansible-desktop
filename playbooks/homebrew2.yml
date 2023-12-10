@@ -1,0 +1,257 @@
+- hosts: localhost
+  become: false
+  name: Macbook Playbook
+  gather_facts: False
+
+  vars:
+    TFENV_ARCH: amd64
+    Brew_packages:
+      - asciidoctor
+    install_homebrew_if_missing: true
+    ccompiler:
+      CC: gcc
+    brew_apps:
+      - act
+      - ansible
+      - ansible-language-server
+      - ansible-lint
+      - asciidoctor
+      - asciinema
+      - awk
+      - autoconf
+      - awscli
+      - bat
+      - btop
+      - checkov
+      - chezmoi
+      - cmake
+      - cookiecutter
+      - coreutils
+      - cruft
+      - csvkit
+      - d2
+      - docker-slim
+      - docutils
+      - dtc
+      - dua-cli
+      - dust
+      - elixir
+      - emacs-plus@29
+      - erlang
+      - exa
+      - exercism
+      - fd
+      - flytectl
+      - fmt
+      - fontconfig
+      - forgit
+      - freetype
+      - fribidi
+      - fzf
+      - gawk
+      - gcc
+      - gd
+      - gh
+      - giflib
+      - git
+      - git-codereview
+      - git-delta
+      - git-extras
+      - git-flow
+      - git-lfs
+      - git-review
+      - git-revise
+      - gnu-sed
+      - gnu-tar
+      - gnupg
+      - gnutls
+      - go
+      - go-task
+      - graphite2
+      - graphviz
+      - grep
+      - gts
+      - harfbuzz
+      - helix
+      - helm
+      - helm-docs
+      - highway
+      - htop
+      - httpie
+      - hugo
+      - iperf
+      - ispell
+      - libevent
+      - jq
+      - jsonnet
+      - just
+      - k3d
+      - k9s
+      - keyring
+      - kind
+      - kube-linter
+      - kubectx
+      - kubefwd
+      - kubernetes-cli
+      - kubeshark
+      - lazydocker
+      - lazygit
+      - libgccjit
+      - libgcrypt
+      - libgit2
+      - libgpg-error
+      - libpng
+      - librsvg
+      - libx11
+      - libxml2
+      - libyaml
+      - lua
+      - luajit
+      - luarocks
+      - luv
+      - lz4
+      - lzo
+      - m4
+      - make
+      - mcrypt
+      - mongodb-atlas-cli
+      - mongodb-community
+      - mongodb-database-tools
+      - mongosh
+      - navi
+      - ncdu
+      - ncurses
+      - neovim
+      - node
+      - nvm
+      - openjdk
+      - openjpeg
+      - openldap
+      - openssl@1.1
+      - openssl@3
+      - pandoc
+      - pixman
+      - plantuml
+      - podman
+      - poetry
+      - pre-commit
+      - protobuf
+      - pstree
+      - pv
+      - pyenv
+      - pyyaml
+      - qemu
+      - ranger
+      - readline
+      - reproc
+      - ripgrep
+      - ruby
+      - six
+      - sk
+      - snappy
+      - socat
+      - sqlite
+      - sqlite3
+      - sshuttle
+      - starship
+      - stern
+      - telnet
+      - terraform
+      - terraform-docs
+      - terragrunt
+      - texinfo
+      - tflint
+      - tfsec
+      - thefuck
+      - tmux
+      - tree
+      - tree-sitter
+      - virtualenv
+      - watch
+      - webp
+      - websocat
+      - wget
+      - wrk
+      - xclip
+      - xz
+      - yaml-cpp
+      - yamllint
+      - yarn
+      - youtube-dl
+      - yq
+      - zellij
+      - zlib
+      - zoxide
+      - zsh-completions
+      - zstd
+    cask_apps:
+      - 1password
+      - 1password-cli
+      - chromedriver
+      - dbeaver-community
+      - espanso
+      - firefox
+      - folx
+      - hammerspoon
+      - insomnia
+      - kitty
+      - maccy
+      - multipass
+      - platypus
+      - qownnotes
+      - spotify
+      - vlc
+
+  environment:
+    CC: gcc
+
+  # pre_tasks:
+  #   - name: Check if Homebrew is installed
+  #     stat:
+  #       path: /usr/local/bin/brew
+  #     register: homebrew_installed
+  #
+  #   - name: Install Homebrew if not present
+  #     shell: |
+  #       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  #     when: not homebrew_installed.stat.exists
+
+  tasks:
+    - name: Ensures taps are present via homebrew
+      community.general.homebrew_tap:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - hashicorp/tap
+        - d12frosted/emacs-plus
+
+    - name: Ensures Homebrew packages are installed
+      community.general.homebrew:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ brew_apps }}"
+      ignore_errors: yes
+      tags:
+        - packages
+
+    - name: Ensures Emacs is installed with Homebrew
+      community.general.homebrew:
+        name: emacs-plus@29
+        state: present
+        install_options: 'appdir=/Applications,with-native-comp,with-xwidgets,with-no-frame-refocus,with-modern-pen-icon'
+      tags:
+        - emacs
+
+    - name: Ensures Homebrew Cask applications are installed
+      community.general.homebrew_cask:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ cask_apps }}"
+      ignore_errors: yes
+      tags:
+        - applications
+
+    - name: Install Asciidoctor with Homebrew
+      homebrew:
+        name: asciidoctor
+        state: present

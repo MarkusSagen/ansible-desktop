@@ -3,7 +3,14 @@
 ## Pre-requisites
 
 1. If on Mac, install Homebrew and Ansible 
-2. Install packages for your distro with:  
+
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+brew install ansible
+```
+
+3. Install packages for your distro with:  
   
   
   Mac:
